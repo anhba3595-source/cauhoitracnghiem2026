@@ -1,0 +1,5 @@
+{
+  "name": "MathGenius THCS",
+  "description": "An AI-powered application that generates customized 10-question multiple-choice quizzes for Vietnamese middle school mathematics based on any topic.",
+  "requestFramePermissions": []
+}
