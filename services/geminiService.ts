@@ -3,13 +3,13 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { Question } from "../types";
 
 export const generateMathQuiz = async (topic: string): Promise<Question[]> => {
-  const apiKey = process.env.API_KEY;
-  if (!apiKey) {
-    throw new Error("API Key is missing. Please ensure it is configured.");
+  // Khởi tạo instance mới mỗi lần gọi để đảm bảo lấy đúng API Key mới nhất từ môi trường
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+  
+  if (!process.env.API_KEY) {
+    throw new Error("Không tìm thấy API Key. Vui lòng cấu hình API_KEY trong Environment Variables trên Vercel và Redeploy.");
   }
 
-  const ai = new GoogleGenAI({ apiKey });
-  
   const prompt = `Bạn là một giáo viên Toán cấp Trung học cơ sở (THCS) dày dạn kinh nghiệm tại Việt Nam. 
   Hãy tạo 10 câu hỏi trắc nghiệm khách quan (MCQ) về chủ đề: "${topic}".
   
@@ -61,7 +61,10 @@ export const generateMathQuiz = async (topic: string): Promise<Question[]> => {
     }
 
     return JSON.parse(jsonStr) as Question[];
-  } catch (error) {
+  } catch (error: any) {
+    if (error.message?.includes("API key not found")) {
+        throw new Error("API Key không hợp lệ hoặc chưa được cấu hình đúng trên Vercel.");
+    }
     console.error("Error generating quiz:", error);
     throw error;
   }
